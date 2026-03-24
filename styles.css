@@ -608,6 +608,14 @@ h2 {
 
 .eco-header { margin-bottom: var(--space-4xl); }
 
+.eco-intro {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  max-width: 640px;
+  margin-top: var(--space-md);
+}
+
 .eco-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);

@@ -349,17 +349,24 @@
     let targetTime = 0;
     let currentSmooth = 0;
 
-    scrollVideo.addEventListener('canplaythrough', () => {
+    function markVideoReady() {
+      if (videoReady) return;
       videoReady = true;
       if (scLoading) scLoading.classList.add('hidden');
-    });
+    }
 
-    scrollVideo.addEventListener('loadedmetadata', () => {
-      if (!videoReady) {
-        videoReady = true;
-        if (scLoading) scLoading.classList.add('hidden');
+    scrollVideo.addEventListener('canplaythrough', markVideoReady);
+    scrollVideo.addEventListener('loadedmetadata', markVideoReady);
+    scrollVideo.addEventListener('loadeddata', markVideoReady);
+
+    // Fallback: hide loading after 5s even if video events don't fire
+    setTimeout(() => {
+      markVideoReady();
+      // Force a seek to kickstart the video element
+      if (scrollVideo.duration) {
+        scrollVideo.currentTime = 0.1;
       }
-    });
+    }, 5000);
 
     // Smooth scrubbing loop (lerp)
     function smoothScrub() {
