@@ -523,9 +523,28 @@
   }
 
   // ────────────────────────────────────────────
+  // CHAPTER NAVIGATION
+  // ────────────────────────────────────────────
+  const chapterCards = document.querySelectorAll('.chapter-card');
+  const video = document.getElementById('mainVideo');
+
+  if (video && chapterCards.length) {
+    chapterCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const timestamp = parseFloat(card.dataset.timestamp);
+        video.currentTime = timestamp;
+        if (video.paused) {
+          video.play();
+          const overlay = document.getElementById('cinemaOverlay');
+          if (overlay) overlay.classList.add('hidden');
+        }
+      });
+    });
+  }
+
+  // ────────────────────────────────────────────
   // CINEMA VIDEO PLAYER
   // ────────────────────────────────────────────
-  const video = document.getElementById('mainVideo');
   const overlay = document.getElementById('cinemaOverlay');
   const progressEl = document.getElementById('cinemaProgress');
   const progressFill = document.getElementById('cinemaProgressFill');
