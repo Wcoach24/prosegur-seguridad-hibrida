@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════
-   PROSEGUR — SEGURIDAD HÍBRIDA V5.1
-   Three.js Globe + Cinema Theater + Day/Night
+   PROSEGUR — SEGURIDAD HÍBRIDA V4
+   Three.js Globe + Scroll Cinema
    ═══════════════════════════════════════════════ */
 
 (function () {
@@ -395,6 +395,50 @@
       });
     }
 
+    // Pause / Play toggle
+    const pauseBtn = document.getElementById('cinemaPauseBtn');
+    function updatePauseIcon() {
+      if (!pauseBtn) return;
+      const pauseIcon = pauseBtn.querySelector('.icon-pause');
+      const playIcon = pauseBtn.querySelector('.icon-play');
+      if (cinemaVideo.paused) {
+        pauseIcon.style.display = 'none';
+        playIcon.style.display = '';
+        pauseBtn.title = 'Reproducir';
+      } else {
+        pauseIcon.style.display = '';
+        playIcon.style.display = 'none';
+        pauseBtn.title = 'Pausar';
+      }
+    }
+    if (pauseBtn) {
+      pauseBtn.addEventListener('click', () => {
+        if (cinemaVideo.paused) {
+          cinemaVideo.play().then(() => {
+            isPlaying = true;
+            if (cinemaOverlay) cinemaOverlay.classList.add('hidden');
+          }).catch(() => {});
+        } else {
+          cinemaVideo.pause();
+          isPlaying = false;
+        }
+        updatePauseIcon();
+      });
+    }
+    // Click on video itself to toggle pause
+    cinemaVideo.addEventListener('click', () => {
+      if (cinemaOverlay && !cinemaOverlay.classList.contains('hidden')) return;
+      if (cinemaVideo.paused) {
+        cinemaVideo.play().then(() => { isPlaying = true; }).catch(() => {});
+      } else {
+        cinemaVideo.pause();
+        isPlaying = false;
+      }
+      updatePauseIcon();
+    });
+    cinemaVideo.addEventListener('play', updatePauseIcon);
+    cinemaVideo.addEventListener('pause', updatePauseIcon);
+
     // Audio toggle button
     const audioBtn = document.getElementById('cinemaAudioBtn');
     function updateAudioIcon() {
@@ -482,36 +526,5 @@
       }
     });
   });
-
-  // ────────────────────────────────────────────
-  // DAY / NIGHT THEME
-  // ────────────────────────────────────────────
-  const themeToggle = document.getElementById('themeToggle');
-
-  function getAutoTheme() {
-    const hour = new Date().getHours();
-    return (hour >= 7 && hour < 19) ? 'day' : 'night';
-  }
-
-  function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-  }
-
-  // Initialize: check localStorage, else auto-detect
-  const savedTheme = localStorage.getItem('prosegur-theme');
-  if (savedTheme) {
-    applyTheme(savedTheme);
-  } else {
-    applyTheme(getAutoTheme());
-  }
-
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'day' ? 'night' : 'day';
-      applyTheme(next);
-      localStorage.setItem('prosegur-theme', next);
-    });
-  }
 
 })();

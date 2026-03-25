@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════
-   PROSEGUR — SEGURIDAD HÍBRIDA V5.1
-   Navy Design System + Day/Night Mode
+   PROSEGUR — SEGURIDAD HÍBRIDA V4
+   Scroll Cinema + Navy Design System
    ═══════════════════════════════════════════════ */
 
 /* ── Design Tokens ── */
@@ -220,9 +220,9 @@ h2 {
 }
 .reveal-up.visible { opacity: 1; transform: translateY(0); }
 
-/* ═══════════════════════════════════
+/* ═════════════════════════════════
    HERO
-   ═══════════════════════════════════ */
+   ═════════════════════════════════ */
 .section-hero {
   min-height: 100vh;
   padding-top: 0;
@@ -306,9 +306,9 @@ h2 {
 }
 .scroll-arrow { color: var(--gold); animation: bounceDown 2s ease infinite; }
 
-/* ═══════════════════════════════════
+/* ═════════════════════════════════
    EVOLUTION
-   ═══════════════════════════════════ */
+   ═════════════════════════════════ */
 .section-evolution {
   background: linear-gradient(180deg, transparent 0%, var(--bg-primary) 25%, var(--bg-primary) 100%);
 }
@@ -361,9 +361,9 @@ h2 {
   color: var(--text-muted);
 }
 
-/* ═══════════════════════════════════
+/* ═════════════════════════════════
    CINEMA THEATER
-   ═══════════════════════════════════ */
+   ═════════════════════════════════ */
 .cinema-theater {
   position: relative;
   z-index: 1;
@@ -410,6 +410,7 @@ h2 {
   aspect-ratio: 16/9;
   object-fit: cover;
   background: #0a0a14;
+  cursor: pointer;
 }
 
 /* Play Overlay */
@@ -443,11 +444,10 @@ h2 {
   filter: drop-shadow(0 0 30px rgba(255, 209, 2, 0.5));
 }
 
-/* Audio / Unmute Button */
-.cinema-audio-btn {
+/* Video Control Buttons */
+.cinema-ctrl-btn {
   position: absolute;
   bottom: 16px;
-  right: 16px;
   z-index: 5;
   background: rgba(4, 8, 16, 0.7);
   backdrop-filter: blur(8px);
@@ -462,11 +462,13 @@ h2 {
   cursor: pointer;
   transition: var(--transition-base);
 }
-.cinema-audio-btn:hover {
+.cinema-ctrl-btn:hover {
   background: rgba(255, 209, 2, 0.15);
   border-color: var(--gold);
   transform: scale(1.1);
 }
+.cinema-pause-btn { right: 64px; }
+.cinema-audio-btn { right: 16px; }
 
 /* Progress Bar */
 .cinema-progress {
@@ -598,9 +600,9 @@ h2 {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ═══════════════════════════════════
+/* ═════════════════════════════════
    ECOSYSTEM
-   ═══════════════════════════════════ */
+   ═════════════════════════════════ */
 .section-ecosystem {
   background: linear-gradient(180deg, var(--bg-accent) 0%, var(--bg-primary) 100%);
   padding-top: 8rem;
@@ -684,9 +686,9 @@ h2 {
   line-height: 1.6;
 }
 
-/* ═══════════════════════════════════
+/* ═════════════════════════════════
    SECTORS
-   ═══════════════════════════════════ */
+   ═════════════════════════════════ */
 .section-sectors {
   background: var(--bg-primary);
   min-height: auto;
@@ -732,9 +734,9 @@ h2 {
   line-height: 1.7;
 }
 
-/* ═══════════════════════════════════
+/* ═════════════════════════════════
    CLOSING / CONVENTION
-   ═══════════════════════════════════ */
+   ═════════════════════════════════ */
 .section-closing {
   background: radial-gradient(ellipse at center, rgba(255, 209, 2, 0.06) 0%, var(--bg-deep) 70%);
   min-height: 50vh;
@@ -801,109 +803,10 @@ footer {
 @keyframes bounceDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
 @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.5); } }
 
-/* ═══════════════════════════════════
-   DAY / NIGHT THEME TOGGLE
-   ═══════════════════════════════════ */
-.theme-toggle {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 200;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-card);
-  backdrop-filter: blur(12px);
-  color: var(--gold);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-base);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-.theme-toggle:hover {
-  border-color: var(--gold);
-  transform: scale(1.1);
-  box-shadow: 0 4px 24px rgba(255, 209, 2, 0.2);
-}
-.theme-toggle .icon-sun,
-.theme-toggle .icon-moon { width: 22px; height: 22px; transition: var(--transition-base); }
-.theme-toggle .icon-sun { display: none; }
-.theme-toggle .icon-moon { display: block; }
 
-/* ── DAY MODE ── */
-[data-theme="day"] {
-  --bg-deep: #f5f5f0;
-  --bg-primary: #eaeae5;
-  --bg-secondary: #e0e0da;
-  --bg-accent: #deded8;
-  --bg-card: rgba(255, 255, 255, 0.75);
-  --bg-card-hover: rgba(255, 255, 255, 0.9);
-
-  --border-subtle: rgba(0, 0, 0, 0.08);
-  --border-hover: rgba(255, 209, 2, 0.5);
-
-  --white: #1a1a2e;
-  --text-primary: rgba(0, 0, 0, 0.88);
-  --text-secondary: rgba(0, 0, 0, 0.6);
-  --text-muted: rgba(0, 0, 0, 0.4);
-
-  --gold: #c8a000;
-  --gold-dim: rgba(200, 160, 0, 0.12);
-  --gold-glow: rgba(200, 160, 0, 0.3);
-  --gold-soft: rgba(200, 160, 0, 0.06);
-}
-
-[data-theme="day"] body {
-  background: var(--bg-deep);
-}
-
-[data-theme="day"] nav.scrolled {
-  background: rgba(245, 245, 240, 0.92);
-}
-
-[data-theme="day"] .mobile-menu {
-  background: rgba(245, 245, 240, 0.96);
-}
-
-[data-theme="day"] .nav-cta {
-  background: var(--gold) !important;
-  color: #fff !important;
-}
-
-[data-theme="day"] .hero-title .line-2 {
-  background: linear-gradient(135deg, #c8a000 0%, #d4b200 40%, #b88700 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-[data-theme="day"] .cinema-screen {
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.1),
-    0 0 40px rgba(0, 0, 0, 0.08),
-    0 24px 60px rgba(0, 0, 0, 0.15);
-}
-
-[data-theme="day"] footer {
-  background: var(--bg-deep);
-}
-
-[data-theme="day"] #globe {
-  opacity: 0.15;
-}
-
-[data-theme="day"] .theme-toggle .icon-sun { display: block; }
-[data-theme="day"] .theme-toggle .icon-moon { display: none; }
-
-[data-theme="day"] .progress-bar {
-  background: linear-gradient(90deg, var(--gold), #b88700);
-}
-
-/* ═══════════════════════════════════
+/* ═════════════════════════════════
    RESPONSIVE
-   ═══════════════════════════════════ */
+   ═════════════════════════════════ */
 @media (max-width: 1024px) {
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .sector-cards { grid-template-columns: repeat(2, 1fr); }
