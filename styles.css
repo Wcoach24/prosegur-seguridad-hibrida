@@ -337,31 +337,6 @@ h2 {
 
 .hero-content { text-align: center; position: relative; z-index: 2; }
 
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-sm);
-  font-family: var(--font-heading);
-  font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  color: var(--gold);
-  background: rgba(255, 209, 2, 0.08);
-  border: 1px solid rgba(255, 209, 2, 0.2);
-  padding: 0.55rem 1.3rem;
-  border-radius: 100px;
-  margin-bottom: var(--space-2xl);
-  opacity: 0;
-  transform: translateY(-20px);
-}
-
-.badge-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--gold);
-  animation: pulse-dot 2s ease infinite;
-}
-
 .hero-title {
   font-family: var(--font-heading);
   font-weight: 800;
@@ -604,7 +579,7 @@ h2 {
   .cinema-fullscreen-btn { display: flex; }
 }
 
-/* Progress bar (clickable seek) */
+/* Progress Bar */
 .cinema-progress {
   position: absolute;
   bottom: 0;
@@ -917,16 +892,6 @@ h2 {
   font-size: 1.15rem;
   color: var(--text-secondary);
   line-height: 1.8;
-}
-
-.closing-year {
-  font-family: var(--font-heading);
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  color: var(--gold);
-  margin-top: var(--space-2xl);
-  opacity: 0.6;
 }
 
 /* ── Footer ── */
