@@ -121,8 +121,18 @@
             </button>
           </div>
 
+          <!-- Pause/Play toggle -->
+          <button class="cinema-ctrl-btn cinema-pause-btn" id="cinemaPauseBtn" aria-label="Pausar" title="Pausar">
+            <svg class="icon-pause" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>
+            </svg>
+            <svg class="icon-play" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </button>
+
           <!-- Audio toggle -->
-          <button class="cinema-audio-btn" id="cinemaAudioBtn" aria-label="Activar audio" title="Activar audio">
+          <button class="cinema-ctrl-btn cinema-audio-btn" id="cinemaAudioBtn" aria-label="Activar audio" title="Activar audio">
             <svg class="icon-muted" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M11 5L6 9H2v6h4l5 4V5z"/>
               <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
@@ -315,16 +325,6 @@
       <span class="footer-credit">Producido por AZM Studio</span>
     </div>
   </footer>
-
-  <!-- Theme Toggle -->
-  <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema" title="Cambiar modo día/noche">
-    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
-    </svg>
-    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-    </svg>
-  </button>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="script.js"></script>
