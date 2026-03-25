@@ -931,6 +931,71 @@ footer {
 
 
 /* ═══════════════════════════════════
+   MOBILE SLIDER DOTS & EDGE FADES
+   ═══════════════════════════════════ */
+.slider-dots {
+  display: none;
+  justify-content: center;
+  gap: 10px;
+  padding: var(--space-lg) 0 0;
+}
+
+.slider-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 209, 2, 0.2);
+  border: 1px solid rgba(255, 209, 2, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+.slider-dot.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(255, 209, 2, 0.5);
+  transform: scale(1.2);
+}
+
+/* Edge fade gradients for sliders */
+.slider-edge-fade {
+  position: relative;
+}
+.slider-edge-fade::before,
+.slider-edge-fade::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: var(--space-lg);
+  width: 40px;
+  z-index: 2;
+  pointer-events: none;
+  display: none;
+}
+.slider-edge-fade::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg-accent), transparent);
+}
+.slider-edge-fade::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg-accent), transparent);
+}
+
+/* Sectors edge fades use different bg */
+.section-sectors .slider-edge-fade::before {
+  background: linear-gradient(to right, var(--bg-primary), transparent);
+}
+.section-sectors .slider-edge-fade::after {
+  background: linear-gradient(to left, var(--bg-primary), transparent);
+}
+
+@media (max-width: 768px) {
+  .slider-dots { display: flex; }
+  .slider-edge-fade::before,
+  .slider-edge-fade::after { display: block; }
+}
+
+/* ═══════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════ */
 @media (max-width: 1024px) {
@@ -958,8 +1023,53 @@ footer {
   .cinema-chapters { grid-template-columns: 1fr 1fr; }
   .cinema-ch p { display: none; }
 
-  .eco-grid { grid-template-columns: 1fr; }
-  .sector-cards { grid-template-columns: 1fr; }
+  /* Snap-scroll slider for cards */
+  .eco-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: var(--space-lg);
+    padding-bottom: var(--space-lg);
+    scrollbar-width: none;
+  }
+  .eco-grid::-webkit-scrollbar { display: none; }
+  .eco-grid .eco-card {
+    flex: 0 0 82%;
+    scroll-snap-align: center;
+    transform: scale(0.92);
+    opacity: 0.5;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease, border-color 0.3s ease;
+  }
+  .eco-grid .eco-card.slider-active {
+    transform: scale(1);
+    opacity: 1;
+    border-color: var(--border-hover);
+    border-bottom-color: var(--gold);
+  }
+
+  .sector-cards {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: var(--space-lg);
+    padding-bottom: var(--space-lg);
+    scrollbar-width: none;
+  }
+  .sector-cards::-webkit-scrollbar { display: none; }
+  .sector-cards .sector-card {
+    flex: 0 0 82%;
+    scroll-snap-align: center;
+    transform: scale(0.92);
+    opacity: 0.5;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease, border-color 0.3s ease;
+  }
+  .sector-cards .sector-card.slider-active {
+    transform: scale(1);
+    opacity: 1;
+    border-color: var(--border-hover);
+  }
 
   .footer-inner { flex-direction: column; text-align: center; gap: var(--space-sm); }
 }
