@@ -960,74 +960,40 @@ footer {
 
   .footer-inner { flex-direction: column; text-align: center; gap: var(--space-sm); }
 
-  /* ── FIX 1: Hero words visible immediately on mobile ──
-     Preloader fade-out IS the reveal. No opacity/transform animation needed.
-     Fixes gradient text (line-2) compositing bug on mobile Safari. */
-  .hero-title .word {
+  /* ── FIX 1+2: ALL words instantly visible on mobile ──
+     Zero animations, zero transitions. Mobile GPUs can't handle
+     clip-path or staggered opacity transitions smoothly.
+     Preloader fade-out is the only "reveal" effect needed. */
+  .word,
+  .hero-title .word,
+  .text-reveal .word,
+  .text-reveal-slow .word {
     clip-path: none !important;
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+    will-change: auto !important;
   }
 
-  /* ── FIX 2: Smooth text reveals — no clip-path, GPU-hinted ── */
-  .text-reveal .word,
-  .text-reveal-slow .word {
-    clip-path: none !important;
-    will-change: opacity, transform;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    transition: opacity 0.5s ease calc(var(--i, 0) * 0.1s),
-                transform 0.5s ease calc(var(--i, 0) * 0.1s) !important;
-  }
-  .text-reveal .word.revealed,
-  .text-reveal-slow .word.revealed {
-    clip-path: none !important;
-  }
-  .text-reveal-slow .word {
-    transition-duration: 0.7s !important;
-    transition-delay: calc(var(--i, 0) * 0.12s) !important;
-  }
-
-  /* ── FIX 3: Horizontal snap-scroll sliders ── */
+  /* ── FIX 3: Cards — clean vertical stack ──
+     No horizontal scroll gimmicks. Full-width cards, proper spacing.
+     Most reliable mobile pattern. */
   .eco-grid {
-    grid-template-columns: none;
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: var(--space-md);
-    padding-bottom: var(--space-md);
-    scrollbar-width: none;
-    margin: 0 calc(-1 * var(--space-lg));
-    padding-left: var(--space-lg);
-    padding-right: var(--space-lg);
   }
-  .eco-grid::-webkit-scrollbar { display: none; }
   .eco-card {
-    min-width: 72vw;
-    scroll-snap-align: center;
-    flex-shrink: 0;
+    padding: var(--space-xl) var(--space-lg);
   }
 
   .sector-cards {
-    grid-template-columns: none;
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: var(--space-md);
-    padding-bottom: var(--space-md);
-    scrollbar-width: none;
-    margin: 0 calc(-1 * var(--space-lg));
-    padding-left: var(--space-lg);
-    padding-right: var(--space-lg);
   }
-  .sector-cards::-webkit-scrollbar { display: none; }
   .sector-card {
-    min-width: 75vw;
-    scroll-snap-align: center;
-    flex-shrink: 0;
+    padding: var(--space-xl) var(--space-lg);
   }
 }
 
