@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════
-   PROSEGUR — SEGURIDAD HÍBRIDA V5
-   Three.js Globe + Cinema Theater
+   PROSEGUR — SEGURIDAD HÍBRIDA V5.1
+   Three.js Globe + Cinema Theater + Day/Night
    ═══════════════════════════════════════════════ */
 
 (function () {
@@ -207,7 +207,7 @@
     camera.position.z += (camZ - camera.position.z) * 0.03;
     camera.lookAt(0, 0, 0);
 
-    // Globe opacity fade
+    // Globe opacity — fades earlier since scroll cinema takes over
     const gOp = scrollProgress < 0.35 ? 1 : Math.max(0, 1 - (scrollProgress - 0.35) * 4);
     wireMat.opacity = 0.06 * gOp;
     glowMat.opacity = 0.02 * gOp;
@@ -374,20 +374,54 @@
       videoObs.observe(cinemaVideo);
     }
 
-    // Manual play button fallback
+    // Manual play button fallback — unmute on user-initiated play
     if (cinemaPlayBtn) {
       cinemaPlayBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        cinemaVideo.muted = false;
         cinemaVideo.play();
         isPlaying = true;
+        updateAudioIcon();
         if (cinemaOverlay) cinemaOverlay.classList.add('hidden');
       });
     }
     if (cinemaOverlay) {
       cinemaOverlay.addEventListener('click', () => {
+        cinemaVideo.muted = false;
         cinemaVideo.play();
         isPlaying = true;
+        updateAudioIcon();
         cinemaOverlay.classList.add('hidden');
+      });
+    }
+
+    // Audio toggle button
+    const audioBtn = document.getElementById('cinemaAudioBtn');
+    function updateAudioIcon() {
+      if (!audioBtn) return;
+      const mutedIcon = audioBtn.querySelector('.icon-muted');
+      const soundIcon = audioBtn.querySelector('.icon-sound');
+      if (cinemaVideo.muted) {
+        mutedIcon.style.display = '';
+        soundIcon.style.display = 'none';
+        audioBtn.title = 'Activar audio';
+      } else {
+        mutedIcon.style.display = 'none';
+        soundIcon.style.display = '';
+        audioBtn.title = 'Silenciar';
+      }
+    }
+    if (audioBtn) {
+      audioBtn.addEventListener('click', () => {
+        cinemaVideo.muted = !cinemaVideo.muted;
+        // If video isn't playing, start it unmuted
+        if (!isPlaying) {
+          cinemaVideo.play().then(() => {
+            isPlaying = true;
+            if (cinemaOverlay) cinemaOverlay.classList.add('hidden');
+          }).catch(() => {});
+        }
+        updateAudioIcon();
       });
     }
 
@@ -448,5 +482,36 @@
       }
     });
   });
+
+  // ────────────────────────────────────────────
+  // DAY / NIGHT THEME
+  // ────────────────────────────────────────────
+  const themeToggle = document.getElementById('themeToggle');
+
+  function getAutoTheme() {
+    const hour = new Date().getHours();
+    return (hour >= 7 && hour < 19) ? 'day' : 'night';
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+
+  // Initialize: check localStorage, else auto-detect
+  const savedTheme = localStorage.getItem('prosegur-theme');
+  if (savedTheme) {
+    applyTheme(savedTheme);
+  } else {
+    applyTheme(getAutoTheme());
+  }
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'day' ? 'night' : 'day';
+      applyTheme(next);
+      localStorage.setItem('prosegur-theme', next);
+    });
+  }
 
 })();

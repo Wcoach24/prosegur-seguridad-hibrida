@@ -31,7 +31,6 @@
         <a href="#accion">En Acción</a>
         <a href="#ecosistema">Ecosistema</a>
         <a href="#sectores">Sectores</a>
-        <a href="#contacto" class="nav-cta">Contactar</a>
       </div>
       <button class="menu-toggle" id="menuToggle" aria-label="Menú">
         <span></span><span></span><span></span>
@@ -43,7 +42,6 @@
     <a href="#accion">En Acción</a>
     <a href="#ecosistema">Ecosistema</a>
     <a href="#sectores">Sectores</a>
-    <a href="#contacto" class="nav-cta">Contactar</a>
   </div>
 
   <!-- ═══ HERO ═══ -->
@@ -122,6 +120,18 @@
               </svg>
             </button>
           </div>
+
+          <!-- Audio toggle -->
+          <button class="cinema-audio-btn" id="cinemaAudioBtn" aria-label="Activar audio" title="Activar audio">
+            <svg class="icon-muted" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+              <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+            </svg>
+            <svg class="icon-sound" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+              <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+              <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>
+            </svg>
+          </button>
 
           <!-- Progress bar -->
           <div class="cinema-progress">
@@ -287,18 +297,13 @@
     </div>
   </section>
 
-  <!-- ═══ CTA ═══ -->
-  <section class="section section-cta" id="contacto">
-    <div class="cta-content">
-      <div class="cta-inner reveal-up">
-        <h2 class="cta-title">Preparados para<br><span class="gold">protegerte.</span></h2>
-        <p class="cta-sub">Descubre cómo la Seguridad Híbrida puede transformar la protección de tu organización.</p>
-        <a href="mailto:info@prosegur.com" class="cta-button">
-          <span>Solicitar información</span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </a>
+  <!-- ═══ CLOSING ═══ -->
+  <section class="section section-closing" id="cierre">
+    <div class="closing-content">
+      <div class="reveal-up">
+        <h2 class="closing-title">Preparados para<br><span class="gold">protegerte.</span></h2>
+        <p class="closing-sub">Personas, tecnología y datos trabajando como un único sistema de protección global.</p>
+        <div class="closing-year">CONVENCIÓN 2025</div>
       </div>
     </div>
   </section>
@@ -310,6 +315,16 @@
       <span class="footer-credit">Producido por AZM Studio</span>
     </div>
   </footer>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema" title="Cambiar modo día/noche">
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+    </svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+    </svg>
+  </button>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="script.js"></script>
