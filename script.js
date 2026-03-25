@@ -1,114 +1,8 @@
 /* ═══════════════════════════════════════════════
-   PROSEGUR — SEGURIDAD HÍBRIDA V6
-   Three.js Globe + Scroll Cinema + WOW Effects
+   PROSEGUR — SEGURIDAD HÍBRIDA V4
+   Three.js Globe + Scroll Cinema
    ═══════════════════════════════════════════════ */
 
-// ════════════════════════════════════════════════
-// PRELOADER — Runs immediately, independent of Three.js
-// ════════════════════════════════════════════════
-(function () {
-  'use strict';
-  const preloader = document.getElementById('preloader');
-  if (!preloader) return;
-
-  const MIN_PRELOADER = 2500;
-  const preloaderStart = performance.now();
-
-  function revealHeroText() {
-    const badge = document.querySelector('.hero-badge');
-    if (badge) {
-      badge.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-      badge.style.opacity = '1';
-      badge.style.transform = 'translateY(0)';
-    }
-    const heroWords = document.querySelectorAll('.hero-title .word');
-    heroWords.forEach((w, i) => {
-      setTimeout(() => w.classList.add('revealed'), i * 200);
-    });
-    const heroSub = document.querySelector('.hero-sub');
-    if (heroSub) {
-      heroSub.style.opacity = '0';
-      heroSub.style.transform = 'translateY(15px)';
-      heroSub.style.transition = 'opacity 0.6s ease 0.6s, transform 0.6s ease 0.6s';
-      requestAnimationFrame(() => {
-        heroSub.style.opacity = '1';
-        heroSub.style.transform = 'translateY(0)';
-      });
-    }
-  }
-
-  function hidePreloader() {
-    preloader.classList.add('fade-out');
-    document.body.classList.remove('loading');
-    setTimeout(() => {
-      preloader.style.display = 'none';
-      revealHeroText();
-    }, 600);
-  }
-
-  const loadPromise = new Promise(resolve => {
-    if (document.readyState === 'complete') resolve();
-    else window.addEventListener('load', resolve, { once: true });
-  });
-  const fontsPromise = document.fonts ? document.fonts.ready : Promise.resolve();
-
-  Promise.all([loadPromise, fontsPromise]).then(() => {
-    const elapsed = performance.now() - preloaderStart;
-    const remaining = Math.max(0, MIN_PRELOADER - elapsed);
-    setTimeout(hidePreloader, remaining);
-  });
-
-  // Safety fallback — hide preloader after 4s no matter what
-  setTimeout(() => {
-    if (!preloader.classList.contains('fade-out')) {
-      hidePreloader();
-    }
-  }, 5000);
-})();
-
-// ════════════════════════════════════════════════
-// TEXT REVEAL — IntersectionObserver (independent of Three.js)
-// ════════════════════════════════════════════════
-(function () {
-  'use strict';
-  const textRevealSections = document.querySelectorAll('.text-reveal');
-  if (!textRevealSections.length || !('IntersectionObserver' in window)) return;
-
-  const textObs = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const words = entry.target.querySelectorAll('.word');
-        words.forEach((w, i) => {
-          setTimeout(() => w.classList.add('revealed'), i * 120);
-        });
-        textObs.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-
-  textRevealSections.forEach(el => textObs.observe(el));
-
-  const closingReveal = document.querySelector('.text-reveal-slow');
-  if (closingReveal) {
-    textObs.unobserve(closingReveal);
-    const closingObs = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const words = entry.target.querySelectorAll('.word');
-          words.forEach((w, i) => {
-            setTimeout(() => w.classList.add('revealed'), i * 180);
-          });
-          closingObs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.3 });
-    closingObs.observe(closingReveal);
-  }
-})();
-
-// ════════════════════════════════════════════════
-// THREE.JS GLOBE + CINEMA + VIDEO FEATURES
-// ════════════════════════════════════════════════
 (function () {
   'use strict';
 
@@ -268,7 +162,7 @@
   // SCROLL STATE
   // ────────────────────────────────────────────
   let scrollProgress = 0;
-  const progressBar = document.querySelector('.progress-bar');
+  const progressBar = document.getElementById('progressBar');
 
   function updateScroll() {
     const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -364,7 +258,7 @@
   // ────────────────────────────────────────────
   // NAV
   // ────────────────────────────────────────────
-  const nav = document.querySelector('nav');
+  const nav = document.getElementById('nav');
   window.addEventListener('scroll', () => {
     if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
   }, { passive: true });
@@ -438,10 +332,10 @@
   // ────────────────────────────────────────────
   // CINEMA THEATER — Autoplay on Viewport
   // ────────────────────────────────────────────
-  const cinemaVideo = document.getElementById('mainVideo');
-  const cinemaOverlay = document.getElementById('playOverlay');
-  const cinemaPlayBtn = document.getElementById('playBtn');
-  const cinemaProgressFill = document.getElementById('progressFill');
+  const cinemaVideo = document.getElementById('cinemaVideo');
+  const cinemaOverlay = document.getElementById('cinemaPlayOverlay');
+  const cinemaPlayBtn = document.getElementById('cinemaPlayBtn');
+  const cinemaProgressFill = document.getElementById('cinemaProgressFill');
   const cinemaChapters = document.querySelectorAll('.cinema-ch');
 
   // Chapter time boundaries in seconds
@@ -487,6 +381,7 @@
         cinemaVideo.muted = false;
         cinemaVideo.play();
         isPlaying = true;
+        updateAudioIcon();
         if (cinemaOverlay) cinemaOverlay.classList.add('hidden');
       });
     }
@@ -495,12 +390,27 @@
         cinemaVideo.muted = false;
         cinemaVideo.play();
         isPlaying = true;
+        updateAudioIcon();
         cinemaOverlay.classList.add('hidden');
       });
     }
 
     // Pause / Play toggle
-    const pauseBtn = document.getElementById('pauseBtn');
+    const pauseBtn = document.getElementById('cinemaPauseBtn');
+    function updatePauseIcon() {
+      if (!pauseBtn) return;
+      const pauseIcon = pauseBtn.querySelector('.icon-pause');
+      const playIcon = pauseBtn.querySelector('.icon-play');
+      if (cinemaVideo.paused) {
+        pauseIcon.style.display = 'none';
+        playIcon.style.display = '';
+        pauseBtn.title = 'Reproducir';
+      } else {
+        pauseIcon.style.display = '';
+        playIcon.style.display = 'none';
+        pauseBtn.title = 'Pausar';
+      }
+    }
     if (pauseBtn) {
       pauseBtn.addEventListener('click', () => {
         if (cinemaVideo.paused) {
@@ -512,6 +422,7 @@
           cinemaVideo.pause();
           isPlaying = false;
         }
+        updatePauseIcon();
       });
     }
     // Click on video itself to toggle pause
@@ -523,36 +434,38 @@
         cinemaVideo.pause();
         isPlaying = false;
       }
+      updatePauseIcon();
     });
+    cinemaVideo.addEventListener('play', updatePauseIcon);
+    cinemaVideo.addEventListener('pause', updatePauseIcon);
 
-    // Fullscreen toggle
-    const fsBtn = document.getElementById('fullscreenBtn');
-    const cinemaScreen = document.querySelector('.cinema-screen');
-    if (fsBtn) {
-      fsBtn.addEventListener('click', () => {
-        const isFs = document.fullscreenElement || document.webkitFullscreenElement;
-        if (isFs) {
-          (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-        } else {
-          const target = cinemaScreen || cinemaVideo;
-          if (target.requestFullscreen) target.requestFullscreen();
-          else if (target.webkitRequestFullscreen) target.webkitRequestFullscreen();
-          else if (cinemaVideo.webkitEnterFullScreen) cinemaVideo.webkitEnterFullScreen();
-        }
-      });
+    // Audio toggle button
+    const audioBtn = document.getElementById('cinemaAudioBtn');
+    function updateAudioIcon() {
+      if (!audioBtn) return;
+      const mutedIcon = audioBtn.querySelector('.icon-muted');
+      const soundIcon = audioBtn.querySelector('.icon-sound');
+      if (cinemaVideo.muted) {
+        mutedIcon.style.display = '';
+        soundIcon.style.display = 'none';
+        audioBtn.title = 'Activar audio';
+      } else {
+        mutedIcon.style.display = 'none';
+        soundIcon.style.display = '';
+        audioBtn.title = 'Silenciar';
+      }
     }
-
-    // Audio toggle
-    const audioBtn = document.getElementById('audioBtn');
     if (audioBtn) {
       audioBtn.addEventListener('click', () => {
         cinemaVideo.muted = !cinemaVideo.muted;
+        // If video isn't playing, start it unmuted
         if (!isPlaying) {
           cinemaVideo.play().then(() => {
             isPlaying = true;
             if (cinemaOverlay) cinemaOverlay.classList.add('hidden');
           }).catch(() => {});
         }
+        updateAudioIcon();
       });
     }
 
@@ -602,115 +515,16 @@
   }
 
   // ────────────────────────────────────────────
-  // VIDEO SEEK — Click/Touch on progress bar
+  // SMOOTH ANCHOR SCROLL
   // ────────────────────────────────────────────
-  const cinemaProgress = document.getElementById('videoProgress');
-  const cinemaTooltip = document.getElementById('timeTooltip');
-
-  if (cinemaProgress && cinemaVideo) {
-    let isDragging = false;
-
-    function seekToPosition(clientX) {
-      const rect = cinemaProgress.getBoundingClientRect();
-      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-      if (cinemaVideo.duration) {
-        cinemaVideo.currentTime = ratio * cinemaVideo.duration;
-      }
-    }
-
-    function formatTime(seconds) {
-      const m = Math.floor(seconds / 60);
-      const s = Math.floor(seconds % 60);
-      return m + ':' + (s < 10 ? '0' : '') + s;
-    }
-
-    function updateTooltip(clientX) {
-      if (!cinemaTooltip || !cinemaVideo.duration) return;
-      const rect = cinemaProgress.getBoundingClientRect();
-      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-      const time = ratio * cinemaVideo.duration;
-      cinemaTooltip.textContent = formatTime(time);
-      cinemaTooltip.style.left = (ratio * 100) + '%';
-    }
-
-    // Click seek
-    cinemaProgress.addEventListener('click', (e) => {
-      seekToPosition(e.clientX);
-    });
-
-    // Drag seek
-    cinemaProgress.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      seekToPosition(e.clientX);
-      e.preventDefault();
-    });
-    document.addEventListener('mousemove', (e) => {
-      if (isDragging) seekToPosition(e.clientX);
-      if (cinemaProgress.matches(':hover') || isDragging) {
-        updateTooltip(e.clientX);
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
-    document.addEventListener('mouseup', () => { isDragging = false; });
+  });
 
-    // Hover tooltip
-    cinemaProgress.addEventListener('mousemove', (e) => {
-      updateTooltip(e.clientX);
-    });
-
-    // Touch seek
-    cinemaProgress.addEventListener('touchstart', (e) => {
-      const touch = e.touches[0];
-      seekToPosition(touch.clientX);
-      e.preventDefault();
-    }, { passive: false });
-    cinemaProgress.addEventListener('touchmove', (e) => {
-      const touch = e.touches[0];
-      seekToPosition(touch.clientX);
-    }, { passive: true });
-  }
-
-  // ────────────────────────────────────────────
-  // DYNAMIC VIDEO GLOW + ECOSYSTEM GRID + SECTORS
-  // ────────────────────────────────────────────
-  const ecoGrid = document.getElementById('ecoGrid');
-  if (ecoGrid) {
-    const ecoItems = [
-      { num: '1', icon: 'bolt', title: 'Vigilancia Inteligente', desc: 'IA que aprende patrones de comportamiento en tiempo real.' },
-      { num: '2', icon: 'shield', title: 'Control de Acceso', desc: 'Biometría avanzada + reconocimiento facial integrado.' },
-      { num: '3', icon: 'network', title: 'Integración 360°', desc: 'Ecosistema unificado: todos los sistemas conectados.' },
-      { num: '4', icon: 'database', title: 'Analytics Avanzado', desc: 'Predicción de riesgos mediante machine learning.' },
-      { num: '5', icon: 'cloud', title: 'Sincronización Cloud', desc: 'Datos distribuidos, resilientes y altamente disponibles.' }
-    ];
-    ecoItems.forEach(item => {
-      const card = document.createElement('div');
-      card.className = 'eco-card reveal-up';
-      card.innerHTML = `
-        <div class="eco-card-num">${item.num}</div>
-        <div class="eco-card-icon"><svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
-        <h3>${item.title}</h3>
-        <p>${item.desc}</p>
-      `;
-      ecoGrid.appendChild(card);
-    });
-  }
-
-  const sectorCards = document.getElementById('sectorCards');
-  if (sectorCards) {
-    const sectors = [
-      { icon: 'building', title: 'Empresas', desc: 'Protección integral de oficinas y plantas.' },
-      { icon: 'hospital', title: 'Hospitales', desc: 'Seguridad biométrica en áreas críticas.' },
-      { icon: 'bank', title: 'Finanzas', desc: 'Control de acceso máximo en cajas de seguridad.' },
-      { icon: 'shipping', title: 'Logística', desc: 'Trazabilidad total de mercancías y activos.' }
-    ];
-    sectors.forEach(sector => {
-      const card = document.createElement('div');
-      card.className = 'sector-card reveal-up';
-      card.innerHTML = `
-        <div class="sector-icon"><svg fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/></svg></div>
-        <h3>${sector.title}</h3>
-        <p>${sector.desc}</p>
-      `;
-      sectorCards.appendChild(card);
-    });
-  }
 })();
