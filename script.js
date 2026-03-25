@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════
-   PROSEGUR — SEGURIDAD HÍBRIDA V4
-   Three.js Globe + Scroll Cinema
+   PROSEGUR — SEGURIDAD HÍBRIDA V5
+   Three.js Globe + Cinema Theater
    ═══════════════════════════════════════════════ */
 
 (function () {
@@ -207,7 +207,7 @@
     camera.position.z += (camZ - camera.position.z) * 0.03;
     camera.lookAt(0, 0, 0);
 
-    // Globe opacity — fades earlier since scroll cinema takes over
+    // Globe opacity fade
     const gOp = scrollProgress < 0.35 ? 1 : Math.max(0, 1 - (scrollProgress - 0.35) * 4);
     wireMat.opacity = 0.06 * gOp;
     glowMat.opacity = 0.02 * gOp;
@@ -330,82 +330,110 @@
   }
 
   // ────────────────────────────────────────────
-  // SCROLL-DRIVEN VIDEO CINEMA
+  // CINEMA THEATER — Autoplay on Viewport
   // ────────────────────────────────────────────
-  const scrollCinema = document.querySelector('.scroll-cinema');
-  const scrollVideo = document.getElementById('scrollVideo');
-  const scLoading = document.getElementById('scLoading');
-  const scHint = document.getElementById('scHint');
-  const scTimelineFill = document.getElementById('scTimelineFill');
-  const scChapters = document.querySelectorAll('.sc-chapter');
-  const scDots = document.querySelectorAll('.sc-timeline-dot');
+  const cinemaVideo = document.getElementById('cinemaVideo');
+  const cinemaOverlay = document.getElementById('cinemaPlayOverlay');
+  const cinemaPlayBtn = document.getElementById('cinemaPlayBtn');
+  const cinemaProgressFill = document.getElementById('cinemaProgressFill');
+  const cinemaChapters = document.querySelectorAll('.cinema-ch');
 
-  // Chapter thresholds (fraction of scroll through cinema section)
+  // Chapter time boundaries in seconds
   // Video: 76s. Ch1: 0-12s, Ch2: 12-50s, Ch3: 50-63s, Ch4: 63-76s
-  const CH_T = [0, 0.158, 0.658, 0.829];
+  const CH_TIMES = [0, 12, 50, 63];
 
-  if (scrollCinema && scrollVideo) {
-    let videoReady = false;
-    let targetTime = 0;
-    let currentSmooth = 0;
+  if (cinemaVideo) {
+    let isPlaying = false;
 
-    function markVideoReady() {
-      if (videoReady) return;
-      videoReady = true;
-      if (scLoading) scLoading.classList.add('hidden');
+    // Try autoplay when visible
+    function tryAutoplay() {
+      const playPromise = cinemaVideo.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          isPlaying = true;
+          if (cinemaOverlay) cinemaOverlay.classList.add('hidden');
+        }).catch(() => {
+          // Autoplay blocked — show play button
+          if (cinemaOverlay) cinemaOverlay.classList.remove('hidden');
+        });
+      }
     }
 
-    scrollVideo.addEventListener('canplaythrough', markVideoReady);
-    scrollVideo.addEventListener('loadedmetadata', markVideoReady);
-    scrollVideo.addEventListener('loadeddata', markVideoReady);
+    // IntersectionObserver: play when 40% visible, pause when out
+    if ('IntersectionObserver' in window) {
+      const videoObs = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !isPlaying) {
+            tryAutoplay();
+          } else if (!entry.isIntersecting && isPlaying) {
+            cinemaVideo.pause();
+            isPlaying = false;
+          }
+        });
+      }, { threshold: 0.4 });
+      videoObs.observe(cinemaVideo);
+    }
 
-    // Fallback: hide loading after 5s even if video events don't fire
-    setTimeout(() => {
-      markVideoReady();
-      // Force a seek to kickstart the video element
-      if (scrollVideo.duration) {
-        scrollVideo.currentTime = 0.1;
-      }
-    }, 5000);
+    // Manual play button fallback
+    if (cinemaPlayBtn) {
+      cinemaPlayBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cinemaVideo.play();
+        isPlaying = true;
+        if (cinemaOverlay) cinemaOverlay.classList.add('hidden');
+      });
+    }
+    if (cinemaOverlay) {
+      cinemaOverlay.addEventListener('click', () => {
+        cinemaVideo.play();
+        isPlaying = true;
+        cinemaOverlay.classList.add('hidden');
+      });
+    }
 
-    // Smooth scrubbing loop (lerp)
-    function smoothScrub() {
-      if (videoReady && scrollVideo.duration) {
-        currentSmooth += (targetTime - currentSmooth) * 0.12;
-        if (Math.abs(currentSmooth - scrollVideo.currentTime) > 0.03) {
-          scrollVideo.currentTime = Math.max(0, Math.min(currentSmooth, scrollVideo.duration - 0.1));
+    // Chapter cards are clickable — seek to chapter start
+    cinemaChapters.forEach((ch, idx) => {
+      ch.addEventListener('click', () => {
+        if (cinemaVideo.duration) {
+          cinemaVideo.currentTime = CH_TIMES[idx];
+          if (!isPlaying) {
+            cinemaVideo.play();
+            isPlaying = true;
+            if (cinemaOverlay) cinemaOverlay.classList.add('hidden');
+          }
         }
-      }
-      requestAnimationFrame(smoothScrub);
-    }
-    requestAnimationFrame(smoothScrub);
+      });
+    });
 
-    function updateCinema() {
-      const rect = scrollCinema.getBoundingClientRect();
-      const scrollableHeight = scrollCinema.offsetHeight - window.innerHeight;
-      if (scrollableHeight <= 0) return;
+    // Update progress + active chapter on timeupdate
+    cinemaVideo.addEventListener('timeupdate', () => {
+      if (!cinemaVideo.duration) return;
+      const t = cinemaVideo.currentTime;
+      const progress = (t / cinemaVideo.duration) * 100;
 
-      const progress = Math.max(0, Math.min(1, -rect.top / scrollableHeight));
-
-      // Video time
-      if (scrollVideo.duration) targetTime = progress * scrollVideo.duration;
+      if (cinemaProgressFill) cinemaProgressFill.style.width = progress + '%';
 
       // Active chapter
       let activeIdx = 0;
-      for (let i = CH_T.length - 1; i >= 0; i--) {
-        if (progress >= CH_T[i]) { activeIdx = i; break; }
+      for (let i = CH_TIMES.length - 1; i >= 0; i--) {
+        if (t >= CH_TIMES[i]) { activeIdx = i; break; }
       }
 
-      scChapters.forEach((ch, i) => ch.classList.toggle('active', i === activeIdx));
-      scDots.forEach((dot, i) => dot.classList.toggle('active', i <= activeIdx));
+      cinemaChapters.forEach((ch, i) => {
+        ch.classList.toggle('active', i === activeIdx);
+        ch.classList.toggle('passed', i < activeIdx);
+      });
+    });
 
-      if (scTimelineFill) scTimelineFill.style.height = (progress * 100) + '%';
-
-      if (scHint) scHint.style.opacity = progress > 0.02 ? '0' : '1';
-    }
-
-    window.addEventListener('scroll', () => requestAnimationFrame(updateCinema), { passive: true });
-    updateCinema();
+    // When video ends, show replay
+    cinemaVideo.addEventListener('ended', () => {
+      isPlaying = false;
+      if (cinemaOverlay) cinemaOverlay.classList.remove('hidden');
+      cinemaChapters.forEach(ch => {
+        ch.classList.remove('active');
+        ch.classList.add('passed');
+      });
+    });
   }
 
   // ────────────────────────────────────────────
