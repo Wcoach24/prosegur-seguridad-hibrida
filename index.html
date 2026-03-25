@@ -19,40 +19,6 @@
   </style>
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="https://res.cloudinary.com/dhuc2wmhp/image/upload/v1774345024/prosegur-favicon_xqkj3a.png" type="image/png">
-  <script>
-  // Preloader — runs immediately, before any external scripts
-  (function () {
-    'use strict';
-    var preloader = document.getElementById('preloader');
-    if (!preloader) return;
-    var MIN_PRELOADER = 2500;
-    var preloaderStart = performance.now();
-    function revealHeroText() {
-      var badge = document.querySelector('.hero-badge');
-      if (badge) { badge.style.transition = 'opacity 0.6s ease, transform 0.6s ease'; badge.style.opacity = '1'; badge.style.transform = 'translateY(0)'; }
-      var heroWords = document.querySelectorAll('.hero-title .word');
-      heroWords.forEach(function(w, i) { setTimeout(function() { w.classList.add('revealed'); }, i * 200); });
-      var heroSub = document.querySelector('.hero-sub');
-      if (heroSub) { heroSub.style.opacity = '0'; heroSub.style.transform = 'translateY(15px)'; heroSub.style.transition = 'opacity 0.6s ease 0.6s, transform 0.6s ease 0.6s'; requestAnimationFrame(function() { heroSub.style.opacity = '1'; heroSub.style.transform = 'translateY(0)'; }); }
-    }
-    function hidePreloader() {
-      preloader.classList.add('fade-out');
-      document.body.classList.remove('loading');
-      setTimeout(function() { preloader.style.display = 'none'; revealHeroText(); }, 600);
-    }
-    var loadPromise = new Promise(function(resolve) { if (document.readyState === 'complete') resolve(); else window.addEventListener('load', resolve, { once: true }); });
-    var fontsPromise = document.fonts ? document.fonts.ready : Promise.resolve();
-    Promise.all([loadPromise, fontsPromise]).then(function() {
-      var elapsed = performance.now() - preloaderStart;
-      var remaining = Math.max(0, MIN_PRELOADER - elapsed);
-      setTimeout(hidePreloader, remaining);
-    });
-    // Safety fallback — hide preloader after 5s no matter what
-    setTimeout(function() { if (!preloader.classList.contains('fade-out')) { hidePreloader(); } }, 5000);
-    // Ultimate fallback: force reveal hero words after 7s
-    setTimeout(function() { document.querySelectorAll('.hero-title .word').forEach(function(w) { if (!w.classList.contains('revealed')) w.classList.add('revealed'); }); }, 7000);
-  })();
-  </script>
 </head>
 <body class="loading">
   <!-- ═══ PRELOADER ═══ -->
@@ -68,6 +34,27 @@
       <div class="preloader-tagline">SEGURIDAD HÍBRIDA</div>
     </div>
   </div>
+
+  <!-- Safety net: force-hide preloader if script.js loads late (slow CDN) -->
+  <script>
+  (function(){
+    var SAFETY_MS = 5000;
+    setTimeout(function(){
+      var p = document.getElementById('preloader');
+      if (p && !p.classList.contains('fade-out')) {
+        p.classList.add('fade-out');
+        document.body.classList.remove('loading');
+        setTimeout(function(){ p.style.display = 'none'; }, 600);
+        var words = document.querySelectorAll('.hero-title .word');
+        words.forEach(function(w, i){
+          setTimeout(function(){ w.classList.add('revealed'); }, 600 + i * 200);
+        });
+        var sub = document.querySelector('.hero-sub');
+        if (sub) { sub.style.transition = 'opacity 0.6s ease 0.6s, transform 0.6s ease 0.6s'; sub.style.opacity = '1'; sub.style.transform = 'translateY(0)'; }
+      }
+    }, SAFETY_MS);
+  })();
+  </script>
 
   <canvas id="globe"></canvas>
   <div class="progress-bar" id="progressBar"></div>
@@ -252,7 +239,6 @@
         <h2 class="text-reveal"><span class="word" style="--i:0">Cinco</span> <span class="word" style="--i:1">capas.</span><br><span class="gold"><span class="word" style="--i:2">Un</span> <span class="word" style="--i:3">sistema.</span></span></h2>
         <p class="eco-intro">Cada elemento potencia al siguiente. La tecnología amplifica el talento humano. Los datos transforman reacción en anticipación.</p>
       </div>
-      <div class="slider-edge-fade">
       <div class="eco-grid">
         <div class="eco-card reveal-up" data-delay="0">
           <div class="eco-card-num">01</div>
@@ -314,8 +300,6 @@
           <p>Dashboards en tiempo real que convierten información en decisiones operativas inmediatas.</p>
         </div>
       </div>
-      <div class="slider-dots" id="ecoSliderDots"></div>
-      </div>
     </div>
   </section>
 
@@ -326,7 +310,6 @@
         <span class="section-label">04 — Sectores</span>
         <h2 class="text-reveal"><span class="word" style="--i:0">Soluciones</span> <span class="word" style="--i:1">que</span> <span class="gold"><span class="word" style="--i:2">evolucionan</span></span><br><span class="word" style="--i:3">con</span> <span class="word" style="--i:4">cada</span> <span class="word" style="--i:5">cliente.</span></h2>
       </div>
-      <div class="slider-edge-fade">
       <div class="sector-cards reveal-up">
         <div class="sector-card">
           <div class="sector-icon">
@@ -365,8 +348,6 @@
           <h3>Corporativo</h3>
           <p>Control de acceso, gestión de visitantes y protección ejecutiva.</p>
         </div>
-      </div>
-      <div class="slider-dots" id="sectorSliderDots"></div>
       </div>
     </div>
   </section>
