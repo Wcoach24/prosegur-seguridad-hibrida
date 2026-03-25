@@ -1,8 +1,114 @@
 /* ═══════════════════════════════════════════════
-   PROSEGUR — SEGURIDAD HÍBRIDA V4
-   Three.js Globe + Scroll Cinema
+   PROSEGUR — SEGURIDAD HÍBRIDA V6
+   Three.js Globe + Scroll Cinema + WOW Effects
    ═══════════════════════════════════════════════ */
 
+// ════════════════════════════════════════════════
+// PRELOADER — Runs immediately, independent of Three.js
+// ════════════════════════════════════════════════
+(function () {
+  'use strict';
+  const preloader = document.getElementById('preloader');
+  if (!preloader) return;
+
+  const MIN_PRELOADER = 1500;
+  const preloaderStart = performance.now();
+
+  function revealHeroText() {
+    const badge = document.querySelector('.hero-badge');
+    if (badge) {
+      badge.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      badge.style.opacity = '1';
+      badge.style.transform = 'translateY(0)';
+    }
+    const heroWords = document.querySelectorAll('.hero-title .word');
+    heroWords.forEach((w, i) => {
+      setTimeout(() => w.classList.add('revealed'), i * 200);
+    });
+    const heroSub = document.querySelector('.hero-sub');
+    if (heroSub) {
+      heroSub.style.opacity = '0';
+      heroSub.style.transform = 'translateY(15px)';
+      heroSub.style.transition = 'opacity 0.6s ease 0.6s, transform 0.6s ease 0.6s';
+      requestAnimationFrame(() => {
+        heroSub.style.opacity = '1';
+        heroSub.style.transform = 'translateY(0)';
+      });
+    }
+  }
+
+  function hidePreloader() {
+    preloader.classList.add('fade-out');
+    document.body.classList.remove('loading');
+    setTimeout(() => {
+      preloader.style.display = 'none';
+      revealHeroText();
+    }, 600);
+  }
+
+  const loadPromise = new Promise(resolve => {
+    if (document.readyState === 'complete') resolve();
+    else window.addEventListener('load', resolve, { once: true });
+  });
+  const fontsPromise = document.fonts ? document.fonts.ready : Promise.resolve();
+
+  Promise.all([loadPromise, fontsPromise]).then(() => {
+    const elapsed = performance.now() - preloaderStart;
+    const remaining = Math.max(0, MIN_PRELOADER - elapsed);
+    setTimeout(hidePreloader, remaining);
+  });
+
+  // Safety fallback — hide preloader after 4s no matter what
+  setTimeout(() => {
+    if (!preloader.classList.contains('fade-out')) {
+      hidePreloader();
+    }
+  }, 4000);
+})();
+
+// ════════════════════════════════════════════════
+// TEXT REVEAL — IntersectionObserver (independent of Three.js)
+// ════════════════════════════════════════════════
+(function () {
+  'use strict';
+  const textRevealSections = document.querySelectorAll('.text-reveal');
+  if (!textRevealSections.length || !('IntersectionObserver' in window)) return;
+
+  const textObs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const words = entry.target.querySelectorAll('.word');
+        words.forEach((w, i) => {
+          setTimeout(() => w.classList.add('revealed'), i * 120);
+        });
+        textObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+  textRevealSections.forEach(el => textObs.observe(el));
+
+  const closingReveal = document.querySelector('.text-reveal-slow');
+  if (closingReveal) {
+    textObs.unobserve(closingReveal);
+    const closingObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const words = entry.target.querySelectorAll('.word');
+          words.forEach((w, i) => {
+            setTimeout(() => w.classList.add('revealed'), i * 180);
+          });
+          closingObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    closingObs.observe(closingReveal);
+  }
+})();
+
+// ════════════════════════════════════════════════
+// THREE.JS GLOBE + CINEMA + VIDEO FEATURES
+// ════════════════════════════════════════════════
 (function () {
   'use strict';
 
@@ -515,6 +621,138 @@
   }
 
   // ────────────────────────────────────────────
+  // VIDEO SEEK — Click/Touch on progress bar
+  // ────────────────────────────────────────────
+  const cinemaProgress = document.getElementById('cinemaProgress');
+  const cinemaTooltip = document.getElementById('cinemaTimeTooltip');
+
+  if (cinemaProgress && cinemaVideo) {
+    let isDragging = false;
+
+    function seekToPosition(clientX) {
+      const rect = cinemaProgress.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      if (cinemaVideo.duration) {
+        cinemaVideo.currentTime = ratio * cinemaVideo.duration;
+      }
+    }
+
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function updateTooltip(clientX) {
+      if (!cinemaTooltip || !cinemaVideo.duration) return;
+      const rect = cinemaProgress.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      const time = ratio * cinemaVideo.duration;
+      cinemaTooltip.textContent = formatTime(time);
+      cinemaTooltip.style.left = (ratio * 100) + '%';
+    }
+
+    // Click seek
+    cinemaProgress.addEventListener('click', (e) => {
+      seekToPosition(e.clientX);
+    });
+
+    // Drag seek
+    cinemaProgress.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      seekToPosition(e.clientX);
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging) seekToPosition(e.clientX);
+      // Update tooltip on hover regardless
+      if (cinemaProgress.matches(':hover') || isDragging) {
+        updateTooltip(e.clientX);
+      }
+    });
+    document.addEventListener('mouseup', () => { isDragging = false; });
+
+    // Hover tooltip
+    cinemaProgress.addEventListener('mousemove', (e) => {
+      updateTooltip(e.clientX);
+    });
+
+    // Touch seek
+    cinemaProgress.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      seekToPosition(touch.clientX);
+      e.preventDefault();
+    }, { passive: false });
+    cinemaProgress.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      seekToPosition(touch.clientX);
+    }, { passive: true });
+  }
+
+  // ────────────────────────────────────────────
+  // DYNAMIC VIDEO GLOW — Canvas color sampling (desktop)
+  // ────────────────────────────────────────────
+  if (cinemaVideo && window.innerWidth > 1024) {
+    const glowCanvas = document.createElement('canvas');
+    glowCanvas.width = 4;
+    glowCanvas.height = 3;
+    const glowCtx = glowCanvas.getContext('2d', { willReadFrequently: true });
+    const cinemaScreen = document.querySelector('.cinema-screen');
+    let glowInterval = null;
+
+    function sampleVideoColor() {
+      if (!cinemaVideo || cinemaVideo.paused || cinemaVideo.ended || !glowCtx) return;
+      try {
+        glowCtx.drawImage(cinemaVideo, 0, 0, 4, 3);
+        const data = glowCtx.getImageData(0, 0, 4, 3).data;
+        let r = 0, g = 0, b = 0;
+        const pixels = 12;
+        for (let i = 0; i < pixels; i++) {
+          r += data[i * 4];
+          g += data[i * 4 + 1];
+          b += data[i * 4 + 2];
+        }
+        r = Math.round(r / pixels);
+        g = Math.round(g / pixels);
+        b = Math.round(b / pixels);
+        // Boost brightness slightly for glow visibility
+        const boost = 1.3;
+        r = Math.min(255, Math.round(r * boost));
+        g = Math.min(255, Math.round(g * boost));
+        b = Math.min(255, Math.round(b * boost));
+        if (cinemaScreen) {
+          cinemaScreen.style.setProperty('--glow-color', `rgba(${r}, ${g}, ${b}, 0.15)`);
+          cinemaScreen.classList.add('dynamic-glow');
+        }
+      } catch (e) {
+        // CORS or other error — fall back to CSS glow
+        if (glowInterval) clearInterval(glowInterval);
+      }
+    }
+
+    cinemaVideo.addEventListener('play', () => {
+      if (!glowInterval) {
+        glowInterval = setInterval(sampleVideoColor, 500);
+      }
+    });
+    cinemaVideo.addEventListener('pause', () => {
+      if (glowInterval) { clearInterval(glowInterval); glowInterval = null; }
+      // Revert to CSS glow
+      if (cinemaScreen) {
+        cinemaScreen.classList.remove('dynamic-glow');
+        cinemaScreen.style.removeProperty('--glow-color');
+      }
+    });
+    cinemaVideo.addEventListener('ended', () => {
+      if (glowInterval) { clearInterval(glowInterval); glowInterval = null; }
+      if (cinemaScreen) {
+        cinemaScreen.classList.remove('dynamic-glow');
+        cinemaScreen.style.removeProperty('--glow-color');
+      }
+    });
+  }
+
+  // ────────────────────────────────────────────
   // SMOOTH ANCHOR SCROLL
   // ────────────────────────────────────────────
   document.querySelectorAll('a[href^="#"]').forEach(a => {
@@ -526,5 +764,6 @@
       }
     });
   });
+
 
 })();
