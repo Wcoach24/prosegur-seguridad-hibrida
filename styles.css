@@ -931,6 +931,16 @@ footer {
 
 
 /* ═══════════════════════════════════
+   MOBILE WORD FADE (compositor-driven)
+   Single container class triggers all words via animation-delay.
+   No per-word JS setTimeout = zero style-thrashing.
+   ═══════════════════════════════════ */
+@keyframes mobileWordFade {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════ */
 @media (max-width: 1024px) {
@@ -968,27 +978,33 @@ footer {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+    animation: none !important;
   }
 
-  /* ── FIX 2: Body text — opacity-only fade, no double stagger ──
-     script.js already staggers via setTimeout(i * 120ms).
-     CSS just does a clean 350ms opacity fade. No clip-path, no transform,
-     no CSS delay. Single GPU-composited property = smooth on any phone. */
+  /* ── FIX 2: Body text — CSS @keyframes animation with stagger ──
+     JS adds ONE class (.words-revealed) to the container.
+     CSS handles per-word timing via animation-delay + --i variable.
+     Result: single style recalc → browser pre-computes entire timeline
+     on compositor thread → buttery smooth on any phone. */
   .text-reveal .word,
   .text-reveal-slow .word {
     clip-path: none !important;
-    transform: none !important;
-    will-change: opacity;
-    transition: opacity 0.35s ease !important;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: none !important;
+    will-change: opacity, transform;
   }
-  .text-reveal .word.revealed,
-  .text-reveal-slow .word.revealed {
-    opacity: 1 !important;
+  .text-reveal.words-revealed .word {
+    animation: mobileWordFade 0.4s ease forwards;
+    animation-delay: calc(var(--i, 0) * 0.07s);
+  }
+  .text-reveal-slow.words-revealed .word {
+    animation: mobileWordFade 0.55s ease forwards;
+    animation-delay: calc(var(--i, 0) * 0.1s);
   }
 
   /* ── FIX 3: Horizontal card slider ──
-     Pure flex + scroll-snap. Cards at 82vw show a peek of next card
-     as affordance to swipe. No grid inheritance, no gimmicks. */
+     Pure flex + scroll-snap. Cards at 80vw show a peek of next card. */
   .eco-grid {
     display: flex !important;
     flex-wrap: nowrap;
@@ -1001,8 +1017,8 @@ footer {
   }
   .eco-grid::-webkit-scrollbar { display: none; }
   .eco-card {
-    flex: 0 0 82vw;
-    max-width: 82vw;
+    flex: 0 0 80vw;
+    max-width: 80vw;
     scroll-snap-align: center;
   }
 
@@ -1018,9 +1034,28 @@ footer {
   }
   .sector-cards::-webkit-scrollbar { display: none; }
   .sector-card {
-    flex: 0 0 85vw;
-    max-width: 85vw;
+    flex: 0 0 82vw;
+    max-width: 82vw;
     scroll-snap-align: center;
+  }
+
+  /* ── Slider dot indicators ── */
+  .slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: var(--space-md) 0 0;
+  }
+  .slider-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 209, 2, 0.2);
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+  .slider-dot.active {
+    background: var(--gold);
+    transform: scale(1.3);
   }
 }
 
