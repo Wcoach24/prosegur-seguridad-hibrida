@@ -3,9 +3,9 @@
    Scroll Cinema + Navy Design System
    ═══════════════════════════════════════════════ */
 
-/* ═══════════════════════════════════
+/* ═══════════════════════════════
    PRELOADER
-   ═══════════════════════════════════ */
+   ═══════════════════════════════ */
 .preloader {
   position: fixed;
   inset: 0;
@@ -296,9 +296,9 @@ h2 {
 }
 .reveal-up.visible { opacity: 1; transform: translateY(0); }
 
-/* ═══════════════════════════════════
+/* ═══════════════════════════════
    CINEMATIC TEXT REVEALS
-   ═══════════════════════════════════ */
+   ═══════════════════════════════ */
 .word {
   display: inline-block;
   clip-path: inset(-10% 100% -10% 0);
@@ -326,9 +326,9 @@ h2 {
   transition-delay: calc(var(--i, 0) * 0.18s), calc(var(--i, 0) * 0.18s), calc(var(--i, 0) * 0.18s);
 }
 
-/* ═══════════════════════════════════
+/* ═══════════════════════════════
    HERO
-   ═══════════════════════════════════ */
+   ═══════════════════════════════ */
 .section-hero {
   min-height: 100vh;
   padding-top: 0;
@@ -386,9 +386,9 @@ h2 {
 }
 .scroll-arrow { color: var(--gold); animation: bounceDown 2s ease infinite; }
 
-/* ═══════════════════════════════════
+/* ═══════════════════════════════
    EVOLUTION
-   ═══════════════════════════════════ */
+   ═══════════════════════════════ */
 .section-evolution {
   background: linear-gradient(180deg, transparent 0%, var(--bg-primary) 25%, var(--bg-primary) 100%);
 }
@@ -441,9 +441,9 @@ h2 {
   color: var(--text-muted);
 }
 
-/* ═══════════════════════════════════
+/* ═══════════════════════════════
    CINEMA THEATER
-   ═══════════════════════════════════ */
+   ═══════════════════════════════ */
 .cinema-theater {
   position: relative;
   z-index: 1;
@@ -736,9 +736,9 @@ h2 {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ═══════════════════════════════════
+/* ═══════════════════════════════
    ECOSYSTEM
-   ═══════════════════════════════════ */
+   ═══════════════════════════════ */
 .section-ecosystem {
   background: linear-gradient(180deg, var(--bg-accent) 0%, var(--bg-primary) 100%);
   padding-top: 8rem;
@@ -822,9 +822,9 @@ h2 {
   line-height: 1.6;
 }
 
-/* ═══════════════════════════════════
+/* ═══════════════════════════════
    SECTORS
-   ═══════════════════════════════════ */
+   ═══════════════════════════════ */
 .section-sectors {
   background: var(--bg-primary);
   min-height: auto;
@@ -870,9 +870,9 @@ h2 {
   line-height: 1.7;
 }
 
-/* ═══════════════════════════════════
+/* ═══════════════════════════════
    CLOSING / CONVENTION
-   ═══════════════════════════════════ */
+   ═══════════════════════════════ */
 .section-closing {
   background: radial-gradient(ellipse at center, rgba(255, 209, 2, 0.06) 0%, var(--bg-deep) 70%);
   min-height: 50vh;
@@ -930,19 +930,19 @@ footer {
 @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.5); } }
 
 
-/* ═══════════════════════════════════
+/* ═══════════════════════════════
    MOBILE WORD FADE (compositor-driven)
    Single container class triggers all words via animation-delay.
    No per-word JS setTimeout = zero style-thrashing.
-   ═══════════════════════════════════ */
+   ═══════════════════════════════ */
 @keyframes mobileWordFade {
   from { opacity: 0; transform: translateY(5px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ═══════════════════════════════════
+/* ═══════════════════════════════
    RESPONSIVE
-   ═══════════════════════════════════ */
+   ═══════════════════════════════ */
 @media (max-width: 1024px) {
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .sector-cards { grid-template-columns: repeat(2, 1fr); }
